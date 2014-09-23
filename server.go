@@ -3,23 +3,59 @@ package main
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"regexp"
 )
 
+type route struct {
+	pattern *regexp.Regexp
+	handler http.Handler
+}
+
+type RegexpHandler struct {
+	routes []*route
+}
+
+func (h *RegexpHandler) Handler(pattern *regexp.Regexp, handler http.Handler) {
+	h.routes = append(h.routes, &route{pattern, handler})
+}
+
+func (h *RegexpHandler) HandleFunc(s string, handler func(http.ResponseWriter, *http.Request)) {
+	rex := regexp.MustCompile(s)
+	h.routes = append(h.routes, &route{rex, http.HandlerFunc(handler)})
+}
+
+func (h *RegexpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for _, route := range h.routes {
+		if route.pattern.MatchString(r.URL.Path) {
+			route.handler.ServeHTTP(w, r)
+			return
+		}
+	}
+	http.NotFound(w, r)
+}
+
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/todos", TodoHandler)
-	r.HandleFunc("/", HomepageHandler)
+	server := &Server{}
 
-	http.Handle("/", r)
-	http.ListenAndServe(":3000", nil)
+	reHandler := new(RegexpHandler)
+	reHandler.HandleFunc("/todos/[0-9]+$", server.showTodo)
+	reHandler.HandleFunc("/todos$", server.todoIndex)
+
+	reHandler.HandleFunc("/", server.homepage)
+
+	http.ListenAndServe(":3000", reHandler)
 }
 
-func HomepageHandler(req http.ResponseWriter, res *http.Request) {
-	fmt.Fprintf(req, "<h1>HomePage</h1>")
+type Server struct{}
+
+func (s *Server) homepage(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(res, "<h1>HomePage</h1>")
 }
 
-func TodoHandler(req http.ResponseWriter, res *http.Request) {
-	fmt.Fprintf(req, "<h2>Todos</h2>")
+func (s *Server) todoIndex(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(res, "<h2>Array of Todos JSON</h2>")
+}
+
+func (s *Server) showTodo(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(res, "<h2>Todo JSON</h2>")
 }
