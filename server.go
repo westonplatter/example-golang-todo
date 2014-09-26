@@ -6,6 +6,8 @@ import (
 	"regexp"
 )
 
+// net/http based router
+
 type route struct {
 	pattern *regexp.Regexp
 	verb    string
@@ -35,13 +37,20 @@ func (h *RegexpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
+// store "context" values and connections in the server struct
+
+type Server struct{}
+
 func main() {
 	server := &Server{}
 
 	reHandler := new(RegexpHandler)
 
-	reHandler.HandleFunc("/todos/[0-9]+$", "GET", server.showTodo)
 	reHandler.HandleFunc("/todos$", "GET", server.todoIndex)
+	reHandler.HandleFunc("/todos$", "POST", server.todoCreate)
+	reHandler.HandleFunc("/todos/[0-9]+$", "GET", server.todoShow)
+	reHandler.HandleFunc("/todos/[0-9]+$", "PUT", server.todoUpdate)
+	reHandler.HandleFunc("/todos/[0-9]+$", "DELETE", server.todoDelete)
 
 	reHandler.HandleFunc("/", "GET", server.homepage)
 
@@ -49,16 +58,26 @@ func main() {
 	http.ListenAndServe(":3000", reHandler)
 }
 
-type Server struct{}
-
 func (s *Server) homepage(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "<h1>HomePage</h1>")
 }
 
 func (s *Server) todoIndex(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(res, "<h2>Array of Todos JSON</h2>")
+	fmt.Fprintf(res, "Array of todo json")
 }
 
-func (s *Server) showTodo(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(res, "<h2>Todo JSON</h2>")
+func (s *Server) todoCreate(res http.ResponseWriter, req *http.Request) {
+	fmt.Println(res, "Created Todo. Send back todo json")
+}
+
+func (s *Server) todoShow(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(res, "Render todo json")
+}
+
+func (s *Server) todoUpdate(res http.ResponseWriter, req *http.Request) {
+	fmt.Println(res, "Updated todo. Render todo json")
+}
+
+func (s *Server) todoDelete(res http.ResponseWriter, req *http.Request) {
+	fmt.Println(res, "Deleted todo. Render todo json")
 }
