@@ -30,7 +30,7 @@ $(function(){
 			if (!this.get("Category")) { this.set({"Category": this.defaults().Category}); }
 		},
 
-		urlRoot: "/api/",
+		urlRoot: "/todos/",
 
 	});
 
@@ -38,7 +38,7 @@ $(function(){
 
 	var postList = Backbone.Collection.extend({
 		model: post,
-		url: "/api/",
+		url: "/todos/",
 	});
 
 	var posts = new postList;
