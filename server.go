@@ -52,6 +52,7 @@ func main() {
 	reHandler.HandleFunc("/todos/[0-9]+$", "PUT", server.todoUpdate)
 	reHandler.HandleFunc("/todos/[0-9]+$", "DELETE", server.todoDelete)
 
+	reHandler.HandleFunc(".*.[js|css|png|eof|svg|ttf|woff]", "GET", server.assets)
 	reHandler.HandleFunc("/", "GET", server.homepage)
 
 	fmt.Println("Starting server on port 3000")
@@ -59,7 +60,11 @@ func main() {
 }
 
 func (s *Server) homepage(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(res, "<h1>HomePage</h1>")
+	http.ServeFile(res, req, "./index.html")
+}
+
+func (s *Server) assets(res http.ResponseWriter, req *http.Request) {
+	http.ServeFile(res, req, req.URL.Path[1:])
 }
 
 func (s *Server) todoIndex(res http.ResponseWriter, req *http.Request) {

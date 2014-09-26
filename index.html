@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title> bongo app - todo </title>
+    <link rel="stylesheet" href="/static/bongo.css"/>
+  </head>
+
+  <body>
+
+    <div id="bongo">
+
+      <header>
+        <h1> bongo </h1>
+
+        <div id="global-actions">
+          <div id="filter-btn" class="menu-nav">
+            <span class="filter all-icon"> All </span>
+            <ul>
+              <li><span class="all-icon">All</span></li>
+              <li><span class="work-icon">Work</span></li>
+              <li><span class="home-icon">Home</span></li>
+              <li><span class="personal-icon">Personal</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </header>
+
+      <section id="main">
+        <div id="enter-form">
+          <input id="new-task-category" type="hidden">
+          <input id="new-task-title" type="text" placeholder="Enter task...">
+          <button class="btn" id="save-task"> Save </button>
+        </div>
+
+        <div id="task-list"></div>
+      </section>
+
+      <footer> </footer>
+
+
+    </div>
+
+    <div id="credits">
+    </div>
+
+    <script src="/static/vendor/json2.js"></script>
+    <script src="/static/vendor/jquery.min.js"></script>
+    <script src="/static/vendor/underscore.js"></script>
+    <script src="/static/vendor/backbone.js"></script>
+    <script src="/static/bongo.js"></script>
+
+    <!-- Templates -->
+
+    <script type="text/template" id="item-template">
+      <div class="view <%= Category%>-view">
+        <div class="row">
+          <div class="check-field grid-s">
+            <input class="check-box" type="checkbox" <%= completed %>>
+          </div>
+          <div class="title <%= completed %> grid-6">
+            <%= Title %>
+          </div>
+          <div class="meta grid-2">
+            <span class="edit-icon" title="Edit Task"></span>
+            <span class="clock-icon" title="<%- dt_created_fmt %>"></span>
+            <span class="trash-icon archive" title="Archive"></span>
+          </div>
+        </div>
+      </div>
+      <div class="edit">
+        <div class="grid-8">
+          <input type="text" class="edit-field" value="<%= Title %>">
+          <button class="btn" id="edit-save"> Save </button>
+        </div>
+      </div>
+    </script>
+
+
+
+  </body>
+</html>
