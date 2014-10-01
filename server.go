@@ -42,12 +42,12 @@ func (h *RegexpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // todo "Object"
 type Todo struct {
-	Id         int    `json:"Id"`
-	Title      string `json:"Title"`
-	Category   string `json:"Category"`
-	Dt_created int64  `json:"int64"`
-	Dt_updated int64  `json:"int64"`
-	State      string `json:"State"`
+	Id           int    `json:"Id"`
+	Title        string `json:"Title"`
+	Category     string `json:"Category"`
+	Dt_created   string `json:"Dt_created"`
+	Dt_completed string `json:"Dt_created"`
+	State        string `json:"State"`
 }
 
 // store "context" values and connections in the server struct
@@ -95,11 +95,11 @@ func (s *Server) assets(res http.ResponseWriter, req *http.Request) {
 func (s *Server) todoIndex(res http.ResponseWriter, req *http.Request) {
 	var todos []*Todo
 
-	rows, err := s.db.Query("SELECT Id, Title, Category, Dt_created, Dt_updated, State FROM Todo")
+	rows, err := s.db.Query("SELECT Id, Title, Category, Dt_created, Dt_completed, State FROM Todo")
 	error_check(res, err)
 	for rows.Next() {
 		todo := &Todo{}
-		rows.Scan(&todo.Id, &todo.Title, &todo.Category, &todo.Dt_created, &todo.Dt_updated, &todo.State)
+		rows.Scan(&todo.Id, &todo.Title, &todo.Category, &todo.Dt_created, &todo.Dt_completed, &todo.State)
 		todos = append(todos, todo)
 	}
 	rows.Close()
@@ -117,19 +117,20 @@ func (s *Server) todoCreate(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	result, err := s.db.Exec("INSERT INTO Todo(Title, Category, State, Dt_created) VALUES(?, ?, ?, ?)", todo.Title, todo.Category, todo.State, todo.Dt_created)
+	fmt.Println(todo)
 
+	result, err := s.db.Exec("INSERT INTO Todo(Title, Category, State, Dt_created) VALUES(?, ?, ?, ?)", todo.Title, todo.Category, todo.State, todo.Dt_created)
 	if err != nil {
 		fmt.Println("ERROR saving to db - ", err)
 	}
 
-	newId64, err := result.LastInsertId()
-	newId := int(newId64)
-	todo = &Todo{Id: newId}
+	Id64, err := result.LastInsertId()
+	Id := int(Id64)
+	todo = &Todo{Id: Id}
 
 	s.db.
-		QueryRow("SELECT State, Title, Category, Dt_created, Dt_updated FROM Todo WHERE Id=?", todo.Id).
-		Scan(&todo.State, &todo.Title, &todo.Category, &todo.Dt_created, &todo.Dt_updated)
+		QueryRow("SELECT State, Title, Category, Dt_created, Dt_completed FROM Todo WHERE Id=?", todo.Id).
+		Scan(&todo.State, &todo.Title, &todo.Category, &todo.Dt_created, &todo.Dt_completed)
 
 	jsonResponse(res, todo)
 }
@@ -139,15 +140,38 @@ func (s *Server) todoShow(res http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) todoUpdate(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Updated todo. Render todo json")
+	todoParams := &Todo{}
+
+	decoder := json.NewDecoder(req.Body)
+	err := decoder.Decode(&todoParams)
+	if err != nil {
+		fmt.Println("ERROR decoding JSON - ", err)
+		return
+	}
+
+	_, err = s.db.Exec("UPDATE Todo SET Title=?, Category=?, Dt_completed=?, State=? WHERE Id=?", todoParams.Title, todoParams.Category, todoParams.Dt_completed, todoParams.State, todoParams.Id)
+
+	if err != nil {
+		fmt.Println("ERROR saving to db - ", err)
+	}
+
+	todo := &Todo{Id: todoParams.Id}
+
+	s.db.
+		QueryRow("SELECT State, Title, Category, Dt_created, Dt_completed FROM Todo WHERE Id=?", todo.Id).
+		Scan(&todo.State, &todo.Title, &todo.Category, &todo.Dt_created, &todo.Dt_completed)
+
+	jsonResponse(res, todo)
 }
 
 func (s *Server) todoDelete(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Deleted todo. Render todo json")
+	r, _ := regexp.Compile(`\d+$`)
+	Id := r.FindString(req.URL.Path)
+	s.db.Exec("DELETE FROM Todo WHERE Id=?", Id)
+	res.WriteHeader(200)
 }
 
 func jsonResponse(res http.ResponseWriter, data interface{}) {
-
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	payload, err := json.Marshal(data)
