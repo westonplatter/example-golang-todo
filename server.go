@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"encoding/json"
 	"net/http"
 	"regexp"
 )
@@ -38,6 +39,15 @@ func (h *RegexpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // store "context" values and connections in the server struct
+// todo "Object"
+type Todo struct {
+	Id           int
+	Title        string
+	Category     string
+	Dt_created   int64
+	Dt_completed int64
+	State        string
+}
 
 type Server struct{}
 
@@ -72,7 +82,17 @@ func (s *Server) todoIndex(res http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) todoCreate(res http.ResponseWriter, req *http.Request) {
-	fmt.Println(res, "Created Todo. Send back todo json")
+	todo := &Todo{}
+	decoder := json.NewDecoder(req.Body)
+	err := decoder.Decode(&todo)
+
+	if err != nil {
+		fmt.Println("ERROR decoding JSON - ", err)
+		return
+	}
+
+	fmt.Println(todo)
+
 	fmt.Println("Created Todo. Send back todo json")
 }
 

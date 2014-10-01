@@ -4,7 +4,7 @@
 
 $(function(){
 
-	Backbone.emulateJSON = true;
+	// Backbone.emulateJSON = true;
 
 	var post = Backbone.Model.extend({
 
