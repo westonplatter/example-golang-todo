@@ -46,8 +46,8 @@ func main() {
 
 	reHandler := new(RegexpHandler)
 
-	reHandler.HandleFunc("/todos$", "GET", server.todoIndex)
-	reHandler.HandleFunc("/todos$", "POST", server.todoCreate)
+	reHandler.HandleFunc("/todos/$", "GET", server.todoIndex)
+	reHandler.HandleFunc("/todos/$", "POST", server.todoCreate)
 	reHandler.HandleFunc("/todos/[0-9]+$", "GET", server.todoShow)
 	reHandler.HandleFunc("/todos/[0-9]+$", "PUT", server.todoUpdate)
 	reHandler.HandleFunc("/todos/[0-9]+$", "DELETE", server.todoDelete)
@@ -68,21 +68,22 @@ func (s *Server) assets(res http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) todoIndex(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(res, "Array of todo json")
+	fmt.Println("Array of todo json")
 }
 
 func (s *Server) todoCreate(res http.ResponseWriter, req *http.Request) {
 	fmt.Println(res, "Created Todo. Send back todo json")
+	fmt.Println("Created Todo. Send back todo json")
 }
 
 func (s *Server) todoShow(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(res, "Render todo json")
+	fmt.Println("Render todo json")
 }
 
 func (s *Server) todoUpdate(res http.ResponseWriter, req *http.Request) {
-	fmt.Println(res, "Updated todo. Render todo json")
+	fmt.Println("Updated todo. Render todo json")
 }
 
 func (s *Server) todoDelete(res http.ResponseWriter, req *http.Request) {
-	fmt.Println(res, "Deleted todo. Render todo json")
+	fmt.Println("Deleted todo. Render todo json")
 }
