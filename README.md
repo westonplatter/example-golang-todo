@@ -30,11 +30,21 @@ Steps for getting up and running,
 
 4. Setup a database
 
-    Make sure you have a database called `golang_todo_dev`, with the following table,
+    The project expects a MySQL sever to be accessible via,
+
+    ```sh
+    host      = localhost
+    username  = root
+    password  = (EMPTY)
+    ```
+
+    Create a database called `golang_todo_dev`,
 
     ```sql
-    create database Todo;
+    create database golang_todo_dev;
     ```
+
+    Create a table called `Todo`,
 
     ```sql
     CREATE TABLE `Todo` (
