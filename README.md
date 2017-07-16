@@ -1,40 +1,55 @@
 # example-golang-todo
 
-## getting started
+Simple Todo List web app.
+
+**The backend is written in Go using the Standard
+Library, only**. The frontend was copy and pasted from the TodoMVC project.
+
+Pull requests are welcomed and **encouraged**!
+
+## Getting started
+
+Steps for getting up and running,
 
 1. Install go
 
-See https://golang.org/doc/install
+    See https://golang.org/doc/install
 
 2. Clone the repo
 
+    ```
     git clone https://github.com/westonplatter/example-golang-todo.git
+    ```
 
 3. Install project dependencies
 
+    ```
     cd example-golang-todo
     go get
+    ```
 
 4. Setup a database
 
-Make sure you have a database called `golang_todo_dev`, with the following table,
+    Make sure you have a database called `golang_todo_dev`, with the following table,
 
-```sql
-create database Todo;
-```
+    ```sql
+    create database Todo;
+    ```
 
-```sql
-CREATE TABLE `Todo` (
-  `Id`          int(11) NOT NULL,
-  `Title`       varchar(255) DEFAULT NULL,
-  `Category`    varchar(255) DEFAULT NULL,
-  `State`       varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-```
+    ```sql
+    CREATE TABLE `Todo` (
+      `Id`          int(11) NOT NULL,
+      `Title`       varchar(255) DEFAULT NULL,
+      `Category`    varchar(255) DEFAULT NULL,
+      `State`       varchar(255) DEFAULT NULL,
+      PRIMARY KEY (`Id`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    ```
 
-4. Run the web app
+5. Run the web app
 
+    ```sh
     go run server.go
+    ```
 
-Visit [localhost:3000](localhost:3000)
+    Visit [localhost:3000](localhost:3000)
