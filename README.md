@@ -50,7 +50,7 @@ Steps for getting up and running,
 
     ```sql
     CREATE TABLE `Todo` (
-      `Id`          int(11) NOT NULL,
+      `Id`          int(11) NOT NULL AUTO_INCREMENT,
       `Title`       varchar(255) DEFAULT NULL,
       `Category`    varchar(255) DEFAULT NULL,
       `State`       varchar(255) DEFAULT NULL,
